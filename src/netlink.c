@@ -161,6 +161,7 @@ static inline int parse_ipv4_prefix(const char *prefix_str, struct ipv4_prefix *
 	const char *slash;
 	int ret;
 	u8 addr[4];
+  ssize_t copied;
 
 	if (!prefix_str || !prefix)
 		return -EINVAL;
@@ -172,8 +173,9 @@ static inline int parse_ipv4_prefix(const char *prefix_str, struct ipv4_prefix *
 	if (slash - prefix_str >= INET_ADDRSTRLEN)
 		return -EINVAL;
 
-	strncpy(addr_str, prefix_str, slash - prefix_str);
-	addr_str[slash - prefix_str] = '\0';
+	copied = strscpy(addr_str, prefix_str, slash - prefix_str);
+  if (copied < 0) 
+    return -EINVAL;
 
 	ret = kstrtoint(slash + 1, 10, &prefix->prefix_len);
 	if (ret < 0)
@@ -220,6 +222,7 @@ static inline int parse_ipv6_prefix(const char *prefix_str, struct ipv6_prefix *
 	char addr_str[INET6_ADDRSTRLEN];
 	const char *slash;
 	int ret;
+  ssize_t copied;
 
 	if (!prefix_str || !prefix)
 		return -EINVAL;
@@ -231,8 +234,9 @@ static inline int parse_ipv6_prefix(const char *prefix_str, struct ipv6_prefix *
 	if (slash - prefix_str >= INET6_ADDRSTRLEN)
 		return -EINVAL;
 
-	strncpy(addr_str, prefix_str, slash - prefix_str);
-	addr_str[slash - prefix_str] = '\0';
+	copied = strscpy(addr_str, prefix_str, slash - prefix_str);
+  if (copied < 0)
+    return -EINVAL;
 
 	ret = kstrtoint(slash + 1, 10, &prefix->prefix_len);
 	if (ret < 0)
